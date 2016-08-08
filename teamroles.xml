@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="1.6" type="plugin" group="user" client="site" order="100" method="upgrade">
+	<name>User - Team Roles</name>
+	<author>Simon Champion, SFW Ltd</author>  
+	<copyright>SFW Ltd</copyright>
+	<license>http://www.gnu.org/licenses/gpl-3.0.html GNU/GPL</license>
+	<authorEmail>support@sfwltd.co.uk</authorEmail>
+	<authorUrl>www.sfwltd.co.uk</authorUrl>
+	<version>1.0</version>
+	<description>Hooks into the Joomdle API to sync membership of specified Joomla groups with Moodle Parent/Child relationship.</description>
+	<files>
+		<filename plugin="teamroles">teamroles.php</filename>
+	</files>
+	<config>
+		<fields name="params">
+			<fieldset name="basic">
+                <field name="parent"  type="accesslevel"   label="Access for 'Parent' role" />
+                <field name="topgroup"  type="usergrouplist" label="Top-level group for Sync" />
+            </fieldset>
+		</fields>
+	</config>
+</extension>
