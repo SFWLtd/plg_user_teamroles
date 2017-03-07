@@ -14,6 +14,12 @@ Dependencies:
 * Joomdle (http://www.joomdle.com) (>v1.0.6; see note below)
 
 
+Version History:
+----------------
+
+v1.1.0  Fixed bugs with syncing new users. But also note the caveat below about plugin ordering.
+v1.0.0  Initial release.
+
 Notes:
 ------
 
@@ -72,3 +78,5 @@ The plugin works well for the use-case for which it was designed. However, if yo
 * This plugin has only been tested against the current versions of Joomla (3.4.8) , Moodle (3.0.2+) and Joomdle (1.0.5) as at the time of writing. Provided that Joomla's plugin API remains the same and that Joomdle itself works, there is no reason why it shouldn't work in other versions, but if you are using other versions, please be aware that it has not been tested, and respond accordingly.
 
 * Be sure that your Joomdle version includes the remove_parent_role method. See notes section above.
+
+* The plugin must be executed after the main Joomdle user hooks plugin. Use Joomla's plugin ordering to set this. Failure to do this will result in new users not being synced as they won't exist yet in Moodle when the plugin tries to sync them.

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version		1.0
+* @version		1.1
 * @package		plg_user_teamroles
 * @author       Simon Champion
 * @copyright	SFW Ltd
@@ -183,6 +183,14 @@ class TeamRolesUserInfo
     public function addComparitor(TeamRolesUserInfo $updated)
     {
         $this->updated = $updated;
+
+        if (!$this->userID) {
+            $this->userID = $updated->userID;
+            $this->username = $updated->username;
+
+            $this->configGroups = $updated->configGroups;
+            $this->configAccess = $updated->configAccess;
+        }
     }
 
     public function sameAsComparitor()
