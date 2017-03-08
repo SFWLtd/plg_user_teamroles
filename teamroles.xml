@@ -6,10 +6,12 @@
 	<license>http://www.gnu.org/licenses/gpl-3.0.html GNU/GPL</license>
 	<authorEmail>support@sfwltd.co.uk</authorEmail>
 	<authorUrl>www.sfwltd.co.uk</authorUrl>
-	<version>1.1.0</version>
+	<version>1.2.0</version>
 	<description>Hooks into the Joomdle API to sync membership of specified Joomla groups with Moodle Parent/Child relationship.</description>
 	<files>
 		<filename plugin="teamroles">teamroles.php</filename>
+		<filename>TeamRolesUpdater.php</filename>
+		<filename>TeamRolesUserInfo.php</filename>
 	</files>
 	<config>
 		<fields name="params">
