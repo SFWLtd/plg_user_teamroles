@@ -12,6 +12,8 @@
 		<filename plugin="teamroles">teamroles.php</filename>
 		<filename>TeamRolesUpdater.php</filename>
 		<filename>TeamRolesUserInfo.php</filename>
+		<filename>TeamRolesAdminTab.php</filename>
+        <folder>fields</folder>
 	</files>
 	<config>
 		<fields name="params">

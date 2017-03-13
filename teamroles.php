@@ -12,6 +12,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 require_once(__DIR__.'/TeamRolesUpdater.php');
 require_once(__DIR__.'/TeamRolesUserInfo.php');
+require_once(__DIR__.'/TeamRolesAdminTab.php');
 
 class plgUserTeamRoles extends JPlugin
 {
@@ -33,5 +34,28 @@ class plgUserTeamRoles extends JPlugin
         $comparitor = new TeamRolesUserInfo($this->params, $user['id'], $user['username']);
         $this->teamRolesUpdater->setComparitorUserInfo($comparitor);
         $this->teamRolesUpdater->updateRoles();
+    }
+
+    /**
+     * Display parent/child info on the user management form, plus a button to re-sync them with Moodle.
+     */
+    public function onContentPrepareForm($form, $data)
+    {
+        if (!($form instanceof JForm)) {
+            $this->_subject->setError('JERROR_NOT_A_FORM');
+            return false;
+        }
+
+        $userID = isset($data->id) ? $data->id : 0;
+
+        // Only show on the admin panel and for existing users.
+        if ($form->getName() !== 'com_admin.profile' || !$userID) {
+            return true;
+        }
+
+        $userInfo = new TeamRolesUserInfo($this->params, $data->id, $data->username);
+        $teamRolesAdminTab = new TeamRolesAdminTab($userInfo);
+        $teamRolesAdminTab->addTeamTabToAdminForm($form);
+        return true;
     }
 }
