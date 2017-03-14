@@ -49,12 +49,13 @@ class plgUserTeamRoles extends JPlugin
         $userID = isset($data->id) ? $data->id : 0;
 
         // Only show on the admin panel and for existing users.
-        if ($form->getName() !== 'com_admin.profile' || !$userID) {
+        $formName = $form->getName();
+        if (in_array($formName, 'com_users.user', 'com_users.profile') || !$userID) {
             return true;
         }
 
         $userInfo = new TeamRolesUserInfo($this->params, $data->id, $data->username);
-        $teamRolesAdminTab = new TeamRolesAdminTab($userInfo);
+        $teamRolesAdminTab = new TeamRolesAdminTab($userInfo, $formName === 'com_users.user');
         $teamRolesAdminTab->addTeamTabToAdminForm($form);
         return true;
     }

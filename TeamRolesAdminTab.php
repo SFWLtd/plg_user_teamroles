@@ -25,11 +25,13 @@ class TeamRolesAdminTab
 eof;
 
     protected $userInfo;
+    protected $adminMode = false;
 
-    public function __construct(TeamRolesUserInfo $userInfo)
+    public function __construct(TeamRolesUserInfo $userInfo, $adminMode)
     {
         JFormHelper::addFieldPath(__DIR__ . '/field');
         $this->userInfo = $userInfo;
+        $this->adminMode = $adminMode;
     }
 
     public function addTeamTabToAdminForm($form)
@@ -50,10 +52,12 @@ eof;
 
         $xml = [];
         foreach ($teamData as $groupID=>$teamGroupData) {
-            $xml[] = "<field type='team' name='team-{$groupID}' label='Team Lead for {$teamGroupData['groupName']}'>";
+            $xml[] = "<field type='team' ".($this->adminMode ? "admin='true'" : "")." name='team-{$groupID}' label='{$teamGroupData['groupName']}'>";
             foreach ($teamGroupData['users'] as $userID) {
-                $username = JFactory::getUser($userID)->get('username');
-                $xml[] = "<member userid='{$userID}'>{$username}</member>";
+                $user = JFactory::getUser($userID);
+                $username = $user->get('username');
+                $name = $user->get('name');
+                $xml[] = "<member userid='{$userID}' username='{$username}'>{$name}</member>";
             }
             $xml[] = "</field>";
         }

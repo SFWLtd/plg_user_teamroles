@@ -11,29 +11,42 @@
 defined('_JEXEC') or die;
 
 jimport('joomla.form.formfield');
+JFormHelper::loadFieldClass('spacer');
 
-class JFormFieldTeam extends JFormField
+class JFormFieldTeam extends JFormFieldSpacer
 {
-	protected $type = 'Team';
- 
-	protected function getTeamUsers()
+    protected function getTeamUsers()
     {
         $output = [];
         foreach ($this->element->xpath('member') as $teamMember) {
             $output[] = (object)[
-                'userID'    => (string)$teamMember['userID'],
-                'username'  => trim((string)$teamMember) ?: $userID,
+                'userID'    => (string)$teamMember['userid'],
+                'name'      => trim((string)$teamMember) ?: $userID,
+                'username'  => (string)$teamMember['username'] ?: $userID,
                 'enabled'   => (string)$teamMember['enabled'] === 'true',
             ];
         }
         return $output;
-	}
+    }
+
+    public function getLabel()
+    {
+        $style = "display:inline-block; overflow:visible; white-space:nowrap; width:1px;";
+        $this->element['label'] = "Team lead for <b style='{$style}'>{$this->element['label']}</b>";
+        return parent::getLabel()."<p>Team Members:</p>";
+        
+        $style = "display:inline-block; overflow:visible; white-space:nowrap; width:1px;";
+        $content = "Team lead for <b style='{$style}'>{$this->element['label']}</b><br>Team Members:";
+        $this->element['label'] = "<div style='text-align:left; display:inline-block;'>{$content}</div>";
+        return parent::getLabel();
+
+    }
 
     public function getInput()
     {
         $list = $this->listTeamMembers();
         return <<<eof
-<div>Team Members</div>
+<p>&nbsp;</p>
 <ul>{$list}</ul>
 eof;
     }
@@ -42,7 +55,11 @@ eof;
     {
         $teamUsersHTML = '';
         foreach ($this->getTeamUsers() as $teamUser) {
-            $teamUsersHTML[] = "<li><span>{$teamUser->username}</li>";
+            if ($this->element['admin']) {
+                $teamUsersHTML[] = "<li><a href='index.php?option=com_users&task=user.edit&id={$teamUser->userID}'>{$teamUser->name} ({$teamUser->username})</a></li>";
+            } else {
+                $teamUsersHTML[] = "<li><span>{$teamUser->name}</span></li>";
+            }
         }
         return implode('', $teamUsersHTML);
     }
