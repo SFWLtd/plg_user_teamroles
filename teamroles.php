@@ -50,7 +50,7 @@ class plgUserTeamRoles extends JPlugin
 
         // Only show on the admin panel and for existing users.
         $formName = $form->getName();
-        if (in_array($formName, 'com_users.user', 'com_users.profile') || !$userID) {
+        if (!in_array($formName, ['com_users.user', 'com_users.profile']) || !$userID) {
             return true;
         }
 
