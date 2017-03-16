@@ -26,11 +26,11 @@ class TeamRolesUserInfo
 
     public function __construct($params, $userID, $username)
     {
-        if (!$userID) {
+        if (!(int)$userID) {
             return;
         }
 
-        $this->userID = $userID;
+        $this->userID = (int)$userID;
         $this->username = $username;
 
         $this->configGroups = $this->subGroupsOfConfigTopGroup($params->get('topgroup'));
@@ -57,6 +57,49 @@ class TeamRolesUserInfo
 
         $db->setQuery($query);
         return $db->loadColumn();
+    }
+
+    public function loadTeamRoleToggleFromProfile($teamMemberID)
+    {
+        $teamMemberID = (int)$teamMemberID;
+        if (!$teamMemberID || $teamMemberID === $this->userID) {
+            return true;
+        }
+        $db = JFactory::getDbo();
+        $db->setQuery("SELECT profile_value FROM #__user_profiles"
+            ." WHERE user_id = {$this->userID} AND profile_key = 'teamroles.show.{$teamMemberID}' "
+            ." ORDER BY ordering");
+        $result = $db->loadResult();
+        if ($result === null) {
+            return true;    //not set yet, so default to true.
+        }
+        return !!$result;
+    }
+
+    public function saveTeamRoleToggleToProfile($teamMemberID, $value)
+    {
+        $value = (bool)$value;
+        $teamMemberID = (int)$teamMemberID;
+        if (!$teamMemberID || $teamMemberID == $this->userID) {
+            return true;
+        }
+
+        $db = JFactory::getDbo();
+        $db->setQuery("DELETE FROM #__user_profiles WHERE user_id={$this->userID} AND profile_key = 'teamroles.show.{$teamMemberID}'");
+        if (!$db->query()) {
+            throw new Exception($db->getErrorMsg());
+        }
+
+        $saveValue = $value ? 1 : 0;
+        $db->setQuery("INSERT INTO #__user_profiles SET "
+            ." user_id={$this->userID},"
+            ." profile_key='teamroles.show.{$teamMemberID}',"
+            ." profile_value={$saveValue},"
+            ." ordering=1");
+        if (!$db->query()) {
+            throw new Exception($db->getErrorMsg());
+        }
+        return $value;
     }
 
     public function addComparitor(TeamRolesUserInfo $updated)

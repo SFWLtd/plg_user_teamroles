@@ -57,6 +57,53 @@ class plgUserTeamRoles extends JPlugin
         $userInfo = new TeamRolesUserInfo($this->params, $data->id, $data->username);
         $teamRolesAdminTab = new TeamRolesAdminTab($userInfo, $formName === 'com_users.user');
         $teamRolesAdminTab->addTeamTabToAdminForm($form);
+        $this->addToggleAjaxJS();
         return true;
+    }
+
+    private function addToggleAjaxJS()
+    {
+        $token = JSession::getFormToken();
+        $js = <<<eof
+jQuery(function() {
+    jQuery(".teamrole-toggle").click(function() {
+        var \$this = jQuery(this);
+        var \$recordInfo = \$this.data('info');
+
+        jQuery.ajax({
+            type: "POST",
+            data: \$recordInfo,
+            url: 'index.php?option=com_ajax&group=user&plugin=TeamRolesToggleUser&format=json&{$token}=1',
+            success: function(results) {
+                console.log(results);
+                \$this.toggle();
+                \$this.siblings().toggle();
+            }
+        });
+    });
+});
+eof;
+        $doc = JFactory::getDocument();
+        $doc->addScriptDeclaration($js);
+    }
+
+    public function onAjaxTeamRolesSync()
+    {
+        return ['synced'=>true];
+    }
+
+    public function onAjaxTeamRolesToggleUser()
+    {
+        if (!JSession::checkToken('get')) {
+            return ['error'=>'Invalid token'];
+        }
+        $input = JFactory::getApplication()->input;
+        $teamLeaderID = $input->getInt('teamLeaderID',0);
+        $teamMemberID = $input->getInt('teamMemberID',0);
+        $on = $input->getBool('on',true);
+
+        $userInfo = new TeamRolesUserInfo($this->params, $teamLeaderID, '');
+        $result = $userInfo->saveTeamRoleToggleToProfile($teamMemberID, $on);
+        return ['toggled'=>$result, 'inputdata'=>[$teamLeaderID, $teamMemberID, $on]];
     }
 }

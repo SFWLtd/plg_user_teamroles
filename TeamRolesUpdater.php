@@ -66,7 +66,9 @@ class TeamRolesUpdater
     private function giveMeParentRoleForGroup($group)
     {
         foreach ($this->usersInGroup($group) as $user) {
-            $this->joomdleAddParentRole(JFactory::getUser($user)->get('username'), $this->userInfo->username);
+            if ($this->userInfo->loadTeamRoleToggleFromProfile($user)) {
+                $this->joomdleAddParentRole(JFactory::getUser($user)->get('username'), $this->userInfo->username);
+            }
         }
     }
 
@@ -89,7 +91,11 @@ class TeamRolesUpdater
     {
         foreach ($this->usersInGroup($group) as $user) {
             if (in_array($this->userInfo->configAccess, JAccess::getAuthorisedViewLevels($user))) {
-                $this->joomdleAddParentRole($this->userInfo->username, JFactory::getUser($user)->get('username'));
+                $teamLeaderInfo = new TeamRolesUserInfo($user);
+                $toggle = $teamLeaderInfo->loadTeamRoleToggleFromProfile($this->userInfo->userID);
+                if ($toggle) {
+                    $this->joomdleAddParentRole($this->userInfo->username, JFactory::getUser($user)->get('username'));
+                }
             }
         }
     }

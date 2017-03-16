@@ -13,7 +13,7 @@
 		<filename>TeamRolesUpdater.php</filename>
 		<filename>TeamRolesUserInfo.php</filename>
 		<filename>TeamRolesAdminTab.php</filename>
-        <folder>fields</folder>
+        <folder>field</folder>
 	</files>
 	<config>
 		<fields name="params">

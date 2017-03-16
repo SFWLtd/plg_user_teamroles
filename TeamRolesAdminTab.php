@@ -37,27 +37,31 @@ eof;
     public function addTeamTabToAdminForm($form)
     {
         if (!$this->userInfo->iAmAParent) {
-            return '';
+            return;
         }
 
-        $fieldsXML = $this->getTeamDataFields();
+        $teamData = $this->getTeamData();
+        if(!count($teamData)) {
+            return;
+        }
+
+        $fieldsXML = $this->getTeamDataFields($teamData);
 
         $teamXML = str_replace('{teamFields}', $fieldsXML, $this->baseXML);
         $form->load($teamXML, false);
     }
 
-    protected function getTeamDataFields()
+    protected function getTeamDataFields($teamData)
     {
-        $teamData = $this->getTeamData();
-
         $xml = [];
         foreach ($teamData as $groupID=>$teamGroupData) {
-            $xml[] = "<field type='team' ".($this->adminMode ? "admin='true'" : "")." name='team-{$groupID}' label='{$teamGroupData['groupName']}'>";
+            $xml[] = "<field type='team' ".($this->adminMode ? "admin='true'" : "")." name='team-{$groupID}' leader='{$this->userInfo->userID}' groupid='{$groupID}' label='{$teamGroupData['groupName']}'>";
             foreach ($teamGroupData['users'] as $userID) {
                 $user = JFactory::getUser($userID);
                 $username = $user->get('username');
                 $name = $user->get('name');
-                $xml[] = "<member userid='{$userID}' username='{$username}'>{$name}</member>";
+                $show = $this->userInfo->loadTeamRoleToggleFromProfile($userID) ? 1 : 0;
+                $xml[] = "<member userid='{$userID}' username='{$username}' on='{$show}'>{$name}</member>";
             }
             $xml[] = "</field>";
         }

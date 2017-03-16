@@ -23,7 +23,7 @@ class JFormFieldTeam extends JFormFieldSpacer
                 'userID'    => (string)$teamMember['userid'],
                 'name'      => trim((string)$teamMember) ?: $userID,
                 'username'  => (string)$teamMember['username'] ?: $userID,
-                'enabled'   => (string)$teamMember['enabled'] === 'true',
+                'on'        => (string)$teamMember['on'] === '1',
             ];
         }
         return $output;
@@ -55,12 +55,32 @@ eof;
     {
         $teamUsersHTML = '';
         foreach ($this->getTeamUsers() as $teamUser) {
+            $toggle = $this->toggleIcons(['teamLeaderID'=>(int)$this->element['leader'], 'teamMemberID'=>$teamUser->userID, 'groupID'=>(string)$this->element['groupid']], $teamUser->on);
             if ($this->element['admin']) {
-                $teamUsersHTML[] = "<li><a href='index.php?option=com_users&task=user.edit&id={$teamUser->userID}'>{$teamUser->name} ({$teamUser->username})</a></li>";
+                $teamUsersHTML[] = "<li>{$toggle}<a href='index.php?option=com_users&task=user.edit&id={$teamUser->userID}'>{$teamUser->name} ({$teamUser->username})</a></li>";
             } else {
-                $teamUsersHTML[] = "<li><span>{$teamUser->name}</span></li>";
+                $teamUsersHTML[] = "<li>{$toggle}<span>{$teamUser->name}</span></li>";
             }
         }
         return implode('', $teamUsersHTML);
+    }
+
+    protected function toggleIcons($info, $on)
+    {
+        $offStyle = $on ? "display:inherit;" : "display:none;";
+        $onStyle = $on ? "display:none;" : "display:inherit;";
+        $info['on'] = !$on;
+        $jsonInfo = htmlentities(json_encode($info), ENT_QUOTES);
+
+return <<<eof
+<span class="teamrole-toggle-wrapper" style="display: inline-block; padding-right: 5px;">
+<a class="btn btn-micro hasTooltip teamrole-toggle teamrole-toggle-off" data-info="{$jsonInfo}" style="{$offStyle}" title="" href="javascript:void(0);" data-original-title="Should this user be listed in the MI panel?">
+<span class="icon-publish"></span>
+</a>
+<a class="btn btn-micro hasTooltip teamrole-toggle teamrole-toggle-on" data-info="{$jsonInfo}" style="{$onStyle}" title="" href="javascript:void(0);" data-original-title="Should this user be listed in the MI panel?">
+<span class="icon-unpublish"></span>
+</a>
+</span>
+eof;
     }
 }
