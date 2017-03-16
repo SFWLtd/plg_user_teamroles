@@ -67,7 +67,7 @@ class TeamRolesUpdater
     {
         foreach ($this->usersInGroup($group) as $user) {
             if ($this->userInfo->loadTeamRoleToggleFromProfile($user)) {
-                $this->joomdleAddParentRole(JFactory::getUser($user)->get('username'), $this->userInfo->username);
+                self::joomdleAddParentRole(JFactory::getUser($user)->get('username'), $this->userInfo->username);
             }
         }
     }
@@ -79,7 +79,7 @@ class TeamRolesUpdater
     private function removeMyParentRoleForGroup($group)
     {
         foreach ($this->usersInGroup($group) as $user) {
-            $this->joomdleRemoveParentRole(JFactory::getUser($user)->get('username'), $this->userInfo->username);
+            $self::joomdleRemoveParentRole(JFactory::getUser($user)->get('username'), $this->userInfo->username);
         }
     }
 
@@ -94,7 +94,7 @@ class TeamRolesUpdater
                 $teamLeaderInfo = new TeamRolesUserInfo($user);
                 $toggle = $teamLeaderInfo->loadTeamRoleToggleFromProfile($this->userInfo->userID);
                 if ($toggle) {
-                    $this->joomdleAddParentRole($this->userInfo->username, JFactory::getUser($user)->get('username'));
+                    self::joomdleAddParentRole($this->userInfo->username, JFactory::getUser($user)->get('username'));
                 }
             }
         }
@@ -108,18 +108,18 @@ class TeamRolesUpdater
     {
         foreach ($this->usersInGroup($group) as $user) {
             if (in_array($this->userInfo->configAccess, JAccess::getAuthorisedViewLevels($user))) {
-                $this->joomdleRemoveParentRole($this->userInfo->username, JFactory::getUser($user)->get('username'));
+                self::joomdleRemoveParentRole($this->userInfo->username, JFactory::getUser($user)->get('username'));
             }
         }
     }
 
-    private function joomdleAddParentRole($child, $parent)
+    public static function joomdleAddParentRole($child, $parent)
     {
         JoomdleHelperContent::call_method('add_parent_role', $child, $parent);
     }
-    private function joomdleRemoveParentRole($child, $parent)
+    public static function joomdleRemoveParentRole($child, $parent)
     {
-        //NB: remove_parent_role is not part of the standard Joomdle package in current version (1.0.5). Should be in place for 1.0.6, but please ensure method exists.
+        //NB: remove_parent_role was not part of the standard Joomdle package until 1.0.6.
         JoomdleHelperContent::call_method('remove_parent_role', $child, $parent);
     }
 

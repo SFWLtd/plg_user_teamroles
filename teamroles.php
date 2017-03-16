@@ -98,12 +98,19 @@ eof;
             return ['error'=>'Invalid token'];
         }
         $input = JFactory::getApplication()->input;
-        $teamLeaderID = $input->getInt('teamLeaderID',0);
-        $teamMemberID = $input->getInt('teamMemberID',0);
-        $on = $input->getBool('on',true);
+        $on = ($input->getString('on','true') === 'true');
+        $teamLeader = JFactory::getUser($input->getInt('teamLeaderID',0));
+        $teamMember = JFactory::getUser($input->getInt('teamMemberID',0));
 
-        $userInfo = new TeamRolesUserInfo($this->params, $teamLeaderID, '');
-        $result = $userInfo->saveTeamRoleToggleToProfile($teamMemberID, $on);
-        return ['toggled'=>$result, 'inputdata'=>[$teamLeaderID, $teamMemberID, $on]];
+        $userInfo = new TeamRolesUserInfo($this->params, $teamLeader->id, $teamLeader->username);
+        $result = $userInfo->saveTeamRoleToggleToProfile($teamMember->id, $on);
+
+        if ($result) {
+            TeamRolesUpdater::joomdleAddParentRole($teamMember->username, $teamLeader->username);
+        } else {
+            TeamRolesUpdater::joomdleRemoveParentRole($teamMember->username, $teamLeader->username);
+        }
+
+        return ['toggled'=>$result];
     }
 }
