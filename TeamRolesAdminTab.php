@@ -46,9 +46,15 @@ eof;
         }
 
         $fieldsXML = $this->getTeamDataFields($teamData);
+        $fieldsXML .= $this->getResyncButton();
 
         $teamXML = str_replace('{teamFields}', $fieldsXML, $this->baseXML);
         $form->load($teamXML, false);
+    }
+
+    protected function getResyncButton()
+    {
+        return "<field type='resyncbutton' name='resync-teams' leader='{$this->userInfo->userID}' />";
     }
 
     protected function getTeamDataFields($teamData)

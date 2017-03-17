@@ -59,6 +59,26 @@ class TeamRolesUpdater
         }
     }
 
+    public function resync()
+    {
+        $comparitor = clone $this->userInfo;
+        $this->setComparitorUserInfo($comparitor);
+
+        $currentParentSetting = $this->userInfo->iAmAParent;
+
+        //switch off their team leader flag and update the Moodle team...
+        $this->userInfo->updated->iAmAParent = !$currentParentSetting;
+        $this->updateRoles();
+
+        //...then switch it back on and update again.
+        $this->userInfo->iAmAParent = !$currentParentSetting;
+        $this->userInfo->updated->iAmAParent = $currentParentSetting;
+        $this->updateRoles();
+
+        //we're done so don't really need to set this back to original value, but be polite to the calling method.
+        $this->userInfo->iAmAParent = $currentParentSetting;
+    }
+
     /**
      * User has been been given group leader rights, so need to give him parent roles for everyone in his group.
      * So look at all the other users in the group and grant him parent connection to them.
@@ -79,7 +99,7 @@ class TeamRolesUpdater
     private function removeMyParentRoleForGroup($group)
     {
         foreach ($this->usersInGroup($group) as $user) {
-            $self::joomdleRemoveParentRole(JFactory::getUser($user)->get('username'), $this->userInfo->username);
+            self::joomdleRemoveParentRole(JFactory::getUser($user)->get('username'), $this->userInfo->username);
         }
     }
 

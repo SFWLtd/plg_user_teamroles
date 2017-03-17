@@ -57,11 +57,11 @@ class plgUserTeamRoles extends JPlugin
         $userInfo = new TeamRolesUserInfo($this->params, $data->id, $data->username);
         $teamRolesAdminTab = new TeamRolesAdminTab($userInfo, $formName === 'com_users.user');
         $teamRolesAdminTab->addTeamTabToAdminForm($form);
-        $this->addToggleAjaxJS();
+        $this->addAjaxJS();
         return true;
     }
 
-    private function addToggleAjaxJS()
+    private function addAjaxJS()
     {
         $token = JSession::getFormToken();
         $js = <<<eof
@@ -81,14 +81,40 @@ jQuery(function() {
             }
         });
     });
+    jQuery(".teamrole-resync").click(function() {
+        var \$this = jQuery(this);
+        var \$recordInfo = \$this.data('info');
+
+        jQuery.ajax({
+            type: "POST",
+            data: \$recordInfo,
+            url: 'index.php?option=com_ajax&group=user&plugin=TeamRolesResync&format=json&{$token}=1',
+            success: function(results) {
+                console.log(results);
+            }
+        });
+    });
 });
 eof;
         $doc = JFactory::getDocument();
         $doc->addScriptDeclaration($js);
     }
 
-    public function onAjaxTeamRolesSync()
+    public function onAjaxTeamRolesResync()
     {
+        if (!JSession::checkToken('get')) {
+            return ['error'=>'Invalid token'];
+        }
+        $input = JFactory::getApplication()->input;
+        $teamLeader = JFactory::getUser($input->getInt('teamLeaderID',0));
+
+        $userInfo = new TeamRolesUserInfo($this->params, $teamLeader->id, $teamLeader->username);
+
+        $this->teamRolesUpdater = new TeamRolesUpdater();
+        $this->teamRolesUpdater->setUserInfo($userInfo);
+
+        $this->teamRolesUpdater->resync();
+
         return ['synced'=>true];
     }
 
