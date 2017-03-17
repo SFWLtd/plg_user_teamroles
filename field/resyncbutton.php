@@ -1,6 +1,6 @@
 <?php
 /**
-* @version		1.2
+* @version		1.3
 * @package		plg_user_teamroles
 * @author       Simon Champion
 * @copyright	SFW Ltd
