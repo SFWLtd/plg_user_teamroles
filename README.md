@@ -17,10 +17,10 @@ Dependencies:
 Version History:
 ----------------
 
-v1.3.0  Added visibility of the team roles in Joomla on the User Profile form, including ability to hide users in the team
-v1.2.0  Internal release.
-v1.1.0  Fixed bugs with syncing new users. But also note the caveat below about plugin ordering.
-v1.0.0  Initial release.
+* v1.3.0  Added visibility of the team roles in Joomla on the User Profile form, including ability to hide users in the team
+* v1.2.0  Internal release.
+* v1.1.0  Fixed bugs with syncing new users. But also note the caveat below about plugin ordering.
+* v1.0.0  Initial release.
 
 
 Notes:
