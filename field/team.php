@@ -67,6 +67,17 @@ eof;
 
     protected function toggleIcons($info, $on)
     {
+        $isSelf = $info['teamLeaderID'] === $info['teamMemberID'];
+        if ($isSelf) {
+            return <<<eof
+<span class="teamrole-toggle-wrapper" style="display: inline-block; padding-right: 5px;">
+<a class="btn btn-micro hasTooltip disabled" title="" href="javascript:void(0);" data-original-title="You cannot remove yourself from the team list">
+<span class="icon-publish"></span>
+</a>
+</span>
+eof;
+        }
+
         $offStyle = $on ? "display:inherit;" : "display:none;";
         $onStyle = $on ? "display:none;" : "display:inherit;";
         $info['on'] = !$on;
