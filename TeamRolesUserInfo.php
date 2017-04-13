@@ -24,7 +24,7 @@ class TeamRolesUserInfo
     public $configGroups;
     public $configAccess;
 
-    public function __construct($params, $userID, $username)
+    public function __construct($params, $userID, $username, $activeUser = true)
     {
         if (!(int)$userID) {
             return;
@@ -36,11 +36,17 @@ class TeamRolesUserInfo
         $this->configGroups = $this->subGroupsOfConfigTopGroup($params->get('topgroup'));
         $this->configAccess = $params->get('parent');
 
-        //get the users groups, and filter it to only include the ones that are configured for parent/child relationships.
-        $this->userGroups   = array_intersect(JAccess::getGroupsByUser($userID), $this->configGroups);
+        if ($activeUser) {
+            //get the users groups, and filter it to only include the ones that are configured for parent/child relationships.
+            $this->userGroups   = array_intersect(JAccess::getGroupsByUser($userID), $this->configGroups);
 
-        //check whether the user has parent access level
-        $this->iAmAParent   = in_array($this->configAccess, JAccess::getAuthorisedViewLevels($userID));
+            //check whether the user has parent access level
+            $this->iAmAParent   = in_array($this->configAccess, JAccess::getAuthorisedViewLevels($userID));
+        } else {
+            //inactive or blocked user should be treated as not belonging to any groups nor being a parent.
+            $this->userGroups   = [];
+            $this->iAmAParent   = false;
+        }
     }
 
     /**
@@ -147,5 +153,17 @@ class TeamRolesUserInfo
     public function groupsUnchanged()
     {
         return array_intersect($this->userGroups, $this->updated->userGroups);
+    }
+
+    public static function usersInGroup($group)
+    {
+        $users = JAccess::getUsersByGroup($group);
+        foreach ($users as $userID) {
+            $userObj = JFactory::getUser($userID);
+            //exclude users who are either blocked or not yet activated.
+            if (!$userObj->block && !(isset($userObj->activation) && $userObj->activation)) {
+                yield $userID;
+            }
+        }
     }
 }

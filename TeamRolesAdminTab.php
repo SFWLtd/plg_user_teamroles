@@ -78,7 +78,7 @@ eof;
     {
         $output = [];
         foreach ($this->userInfo->userGroups as $groupID) {
-            $users = JAccess::getUsersByGroup($groupID);
+            $users = TeamRolesUserInfo::usersInGroup($groupID);
             $output[$groupID] = [
                 'groupName'=>$this->loadGroupName($groupID),
                 'users'=>$users

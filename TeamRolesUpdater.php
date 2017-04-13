@@ -85,7 +85,7 @@ class TeamRolesUpdater
      */
     private function giveMeParentRoleForGroup($group)
     {
-        foreach ($this->usersInGroup($group) as $user) {
+        foreach (TeamRolesUserInfo::usersInGroup($group) as $user) {
             if ($this->userInfo->loadTeamRoleToggleFromProfile($user)) {
                 self::joomdleAddParentRole(JFactory::getUser($user)->get('username'), $this->userInfo->username);
             }
@@ -98,7 +98,7 @@ class TeamRolesUpdater
      */
     private function removeMyParentRoleForGroup($group)
     {
-        foreach ($this->usersInGroup($group) as $user) {
+        foreach (TeamRolesUserInfo::usersInGroup($group) as $user) {
             self::joomdleRemoveParentRole(JFactory::getUser($user)->get('username'), $this->userInfo->username);
         }
     }
@@ -109,7 +109,7 @@ class TeamRolesUpdater
      */
     private function giveMeChildRoleForGroup($group)
     {
-        foreach ($this->usersInGroup($group) as $user) {
+        foreach (TeamRolesUserInfo::usersInGroup($group) as $user) {
             if (in_array($this->userInfo->configAccess, JAccess::getAuthorisedViewLevels($user))) {
                 $teamLeaderInfo = new TeamRolesUserInfo($user);
                 $toggle = $teamLeaderInfo->loadTeamRoleToggleFromProfile($this->userInfo->userID);
@@ -126,7 +126,7 @@ class TeamRolesUpdater
      */
     private function removeMyChildRoleForGroup($group)
     {
-        foreach ($this->usersInGroup($group) as $user) {
+        foreach (TeamRolesUserInfo::usersInGroup($group) as $user) {
             if (in_array($this->userInfo->configAccess, JAccess::getAuthorisedViewLevels($user))) {
                 self::joomdleRemoveParentRole($this->userInfo->username, JFactory::getUser($user)->get('username'));
             }
@@ -142,10 +142,4 @@ class TeamRolesUpdater
         //NB: remove_parent_role was not part of the standard Joomdle package until 1.0.6.
         JoomdleHelperContent::call_method('remove_parent_role', $child, $parent);
     }
-
-    private function usersInGroup($group)
-    {
-        return JAccess::getUsersByGroup($group);
-    }
-
 }

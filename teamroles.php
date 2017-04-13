@@ -20,7 +20,9 @@ class plgUserTeamRoles extends JPlugin
 
     public function onUserBeforeSave($oldUser, $isNew, $newUser)
     {
-        $userInfo = new TeamRolesUserInfo($this->params, $oldUser['id'], $oldUser['username']);
+        $activeUser = (!$oldUser['activation'] && !$oldUser['block']);
+
+        $userInfo = new TeamRolesUserInfo($this->params, $oldUser['id'], $oldUser['username'], $activeUser);
         $this->teamRolesUpdater = new TeamRolesUpdater();
         $this->teamRolesUpdater->setUserInfo($userInfo);
     }
@@ -30,8 +32,11 @@ class plgUserTeamRoles extends JPlugin
         if (!$success) {
             return;
         }
+
+        $activeUser = (!$user['activation'] && !$user['block']);
+
         JAccess::clearStatics();
-        $comparitor = new TeamRolesUserInfo($this->params, $user['id'], $user['username']);
+        $comparitor = new TeamRolesUserInfo($this->params, $user['id'], $user['username'], $activeUser);
         $this->teamRolesUpdater->setComparitorUserInfo($comparitor);
         $this->teamRolesUpdater->updateRoles();
     }
@@ -91,6 +96,7 @@ jQuery(function() {
             url: 'index.php?option=com_ajax&group=user&plugin=TeamRolesResync&format=json&{$token}=1',
             success: function(results) {
                 console.log(results);
+                alert(results.data[0].synced ? "Resync completed successfully." : "An error occurred while resyncing.");
             }
         });
     });
